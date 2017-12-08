@@ -34,7 +34,7 @@ for idx, fname in enumerate(images):
         #write_name = 'corners_found'+str(idx)+'.jpg'
         #cv2.imwrite(write_name, img)
         cv2.imshow('img', img)
-        cv2.waitKey(500)
+        cv2.waitKey(50)
 
 cv2.destroyAllWindows()
 
@@ -58,8 +58,10 @@ dist_pickle["dist"] = dist
 pickle.dump( dist_pickle, open( "calibration_wide/wide_dist_pickle.p", "wb" ) )
 #dst = cv2.cvtColor(dst, cv2.COLOR_BGR2RGB)
 # Visualize undistortion
-f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))
+f, (ax1, ax2) = plt.subplots(1, 2, figsize=(10,5))
 ax1.imshow(img)
 ax1.set_title('Original Image', fontsize=30)
 ax2.imshow(dst)
 ax2.set_title('Undistorted Image', fontsize=30)
+
+plt.show()
