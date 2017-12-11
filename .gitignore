@@ -3,5 +3,8 @@ calibration_wide
 imgs
 video_images
 gif_images
+
 *.db
+
 .ipynb_checkpoints
+Rubbish
