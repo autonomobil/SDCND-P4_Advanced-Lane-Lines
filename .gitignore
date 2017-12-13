@@ -1,11 +1,8 @@
 calibration_wide
-
 video_images
 imgs
 gif_images
-
 *.db
-
 .ipynb_checkpoints
 Rubbish
 project_video
