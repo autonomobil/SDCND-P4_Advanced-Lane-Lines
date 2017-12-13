@@ -31,9 +31,9 @@
 
 This project builds on the first project, but now uses advanced method of finding lines. The aim of this project is to write a robust lane line finding algorithm to deal with complex senarios like curving lines, shadows and changes in the color of the pavement.
 
-**Results (Youtube link):**
+Images from the videos, which are used in this project ([SDCND-P4_Advanced-Lane-Lines.ipynb](SDCND-P4_Advanced-Lane-Lines.ipynb)) can be found [here(mega.nz link)](https://mega.nz/#F!ZVtiCbzB!SiGp-xlmmwTKEk06fZNpug)
 
-Images from the videos, which are used in this project ([SDCND-P4_Advanced-Lane-Lines.ipynb](SDCND-P4_Advanced-Lane-Lines.ipynb)) can be found [here(mega.nz link):](https://mega.nz/#F!ZVtiCbzB!SiGp-xlmmwTKEk06fZNpug)
+**Results (Youtube link):**
 
 [![result1](https://img.youtube.com/vi/Ji-hsxMeTFE/0.jpg)](https://www.youtube.com/watch?v=Ji-hsxMeTFE)
 
