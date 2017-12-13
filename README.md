@@ -84,7 +84,7 @@ Examples of undistorted and edge enhanced images :
 
 ### 2. **Warping & cutting image**
 
-The OpenCV function **"cv2.getPerspectiveTransform"** is been used to correctly rectify each image to a "birds-eye view". As the method of interpolation **"cv2.INTER_NEAREST"** gives the best result for my pipeline. The source and destination points are hand-tuned to the two images with straight lines.
+The OpenCV function **"cv2.getPerspectiveTransform"** is been used to correctly rectify each image to a "birds-eye view". As the method of interpolation **"cv2.INTER_NEAREST"** gives the best result for my pipeline. The source and destination points are hand-tuned to the two images with straight lines. The perspective transformed image of straight lines should have lane lines that are close to being ‘parallel’ to one another. This is because the lane lines are equidistant from one another, so it should maintain this equidistance throughout the warped image.
 This resulted in the following source and destination points:
 
 | Source        | Destination   | Comment|
@@ -242,3 +242,19 @@ A complete image processing pipeline was established to find the lane lines in i
 **Example of pipelined frame with debugging views:**
 
 ![img15]
+
+---
+
+## Discussion:
+
+The problems I encountered were almost exclusively due to lighting conditions, shadows, discoloration, etc. It wasn't difficult to dial in threshold parameters to get the pipeline to perform well on the original project video (particularly after discovering the B channel of the LAB colorspace, which isolates the yellow lines very well), even on the lighter-gray bridge sections that comprised the most difficult sections of the video.
+
+The challenge video was harder, because of very bad lighting conditions. To also succed in the challenge video I had to come up with the mentioned method of binary windows. This works acceptable on the challenge video, but not perfect. Also it seems that the camera mounting in the challenge video is different, which causes some perspective problems.
+
+Another problem occurs when no dashed line is detected near the front of the car and the line is going sideways. One strategy could be to come up with "anchor-points" that are located at ``y = ysize - 20 pixel(hood) = 700``, so where the line hits the car front. This crossings points should only change slightly if the car is not changing lanes. This approach could also be used to invalidate poly-fits if the left and right anchor points aren't a certain distance apart (within some tolerance) under the assumption that the lane width will remain relatively constant.
+
+You could also have a look in more sophisticated methods for [*ORGB: Offset Correction in RGB Color Space for Illumination-Robust Image Processing*](https://arxiv.org/abs/1708.00975).
+
+I chose not to used any Sobel operators in this project since I wasn't able to find sobel parameters that worked better than the color thresholding I used. I found that the sobel thresholds are very noisy.
+
+The worst what could happen to my pipeline is something like the harder challenge video where sometimes some lines aren't even visible, then my pipeline detects noise as lines falsely and has a hard time redecting the right line.
