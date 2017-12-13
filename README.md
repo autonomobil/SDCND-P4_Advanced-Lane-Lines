@@ -235,7 +235,7 @@ right_curverad = ((1 + (2*right_fit_corrected[0]*y_eval*ym_per_pix + right_fit_c
 ![img14]
 
 ### 8. **Complete Pipeline**
-A complete image processing pipeline was established to find the lane lines in images successfully and can process videos frame by frame. The video output ``project_video_output`` and ``challenge_video_output`` can be found in this directory.
+A complete image processing pipeline was established to find the lane lines in images successfully and can process videos frame by frame. The video output ``project_video_output.mp4`` and ``challenge_video_output.mp4`` can be found in this directory.
 
 **Example of pipelined frame with debugging views:**
 
