@@ -24,7 +24,7 @@
 
 # ## 0. Import Libs and setting which examples to plot
 
-# In[1]:
+# In[ ]:
 
 
 import numpy as np
@@ -35,15 +35,15 @@ import matplotlib.image as mpimg
 import pickle
 import re
 
-plot_demos = 0 # set this to 0 to plot all examples, >8 => direct video creating
+plot_demos = 2 # set this to 0 to plot all examples, >8 => direct video creating
 
 # %matplotlib
-get_ipython().run_line_magic('matplotlib', 'inline')
+# get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # ## 0. Helper functions
 
-# In[2]:
+# In[ ]:
 
 
 def tryint(s):
@@ -156,13 +156,6 @@ def gaussian_blur(img, kernel_size):
     """Applies a Gaussian Noise kernel"""
     return cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
 
-
-
-# ## 1. Calibration & Edge Enhancement
-
-# In[3]:
-
-
 def edge_enhancement(img, max_value=8):
     """OpenCV with Python By Example by Prateek Joshi
     """
@@ -178,7 +171,9 @@ def edge_enhancement(img, max_value=8):
     return output
 
 
-# In[4]:
+# ## 1. Calibration
+
+# In[ ]:
 
 
 use_dumped_cali_file = 1 # if set to 1 use calibration_file.p file
@@ -226,7 +221,7 @@ def undistort_img(img, mtx = mtx, dist = dist):
 
 # ### 1.1 Demo
 
-# In[5]:
+# In[ ]:
 
 
 # Demo
@@ -238,15 +233,15 @@ if plot_demos <= 1 :
 
     img = mpimg.imread('./test_images/test3.jpg')
     dst = undistort_img(img, mtx, dist)
-    dst = edge_enhancement(dst)
+#     dst = edge_enhancement(dst)
     plot_two_images(img, dst, titles = ['original','undistorted'], save_it = 1, save_name = '1_undistorted2')
 
 
 
 
-# ## 2. Warping & cutting image
+# ## 2. Warping & Edge Enhancement & cutting image
 
-# In[6]:
+# In[27]:
 
 
 def warp_img(img, src = None, dst = None, w_Mat = [0]):
@@ -266,8 +261,8 @@ ysize = img.shape[0]
 xsize = img.shape[1]
 
 #source points
-src = np.float32([(720,470),    #top right
-                (565,470),      #top left
+src = np.float32([(675,440),    #top right
+                (608,440),      #top left
                 (258,690),      #bottom left
                 (1062,690)])    #bottom right
 
@@ -278,7 +273,7 @@ dst = np.float32([(xsize-425,0),
                 (xsize-425,ysize)])
 
 
-# In[7]:
+# In[28]:
 
 
 def cut_img(img, x_pixel = 250):
@@ -295,20 +290,27 @@ def cut_img(img, x_pixel = 250):
     img = region_of_interest(img, vertices)
     return img
 
-def preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst, cut_flag = 0):
+def preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst, cut_flag = 1, enhance_flag = 1):
+    img = gaussian_blur(img, 5)
+
     img = undistort_img(img, mtx, dist)
+
     img, M, M_inv = warp_img(img, src, dst)
-    img = edge_enhancement(img)
+
+#     if enhance_flag:
+#         img = edge_enhancement(img)
 
     if cut_flag:
         img = cut_img(img)
+
+
     return img, M , M_inv
 
 
 
 # ### 2.1 Demo
 
-# In[8]:
+# In[29]:
 
 
 # Demo
@@ -321,9 +323,9 @@ if plot_demos <= 2:
 
     img = mpimg.imread('./test_images/straight_lines2.jpg')
 
-    warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst)
+    warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst, cut_flag = 0, enhance_flag = 0)
 
-    _, ax1, ax2 = plot_two_images(img, warped_img, show = 0, titles = ['original','warped'])
+    _, ax1, ax2 = plot_two_images(img, warped_img, show = 0, titles = ['original','undistorted & warped'])
     ax1.plot(x, y,'r', alpha=0.5, linewidth=1)
     ax2.plot(x2, y2,'r', alpha=0.5, linewidth=2)
     plt.savefig('./output_images/2_img_straight.png')
@@ -332,18 +334,33 @@ if plot_demos <= 2:
     ####
     img = mpimg.imread('./test_images/straight_lines1.jpg')
 
-    warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst, cut_flag = 1)
+    warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst, cut_flag = 0, enhance_flag = 0)
 
-    _, ax1, ax2 = plot_two_images(img, warped_img, show = 0, titles = ['original','warped&cut'])
+    _, ax1, ax2 = plot_two_images(img, warped_img, show = 0, titles = ['original','undistorted & warped'])
+    ax1.plot(x, y,'r', alpha=0.5, linewidth=1)
+    ax2.plot(x2, y2,'r', alpha=0.5, linewidth=2)
+    plt.savefig('./output_images/2_img_straight1.png')
+
+    warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst, cut_flag = 0)
+
+    _, ax1, ax2 = plot_two_images(img, warped_img, show = 0, titles = ['original','undistorted & warped & edge enhanced'])
     ax1.plot(x, y,'r', alpha=0.5, linewidth=1)
     ax2.plot(x2, y2,'r', alpha=0.5, linewidth=2)
     plt.savefig('./output_images/2_img_straight2.png')
+
+    ####
+    warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst)
+    _, ax1, ax2 = plot_two_images(img, warped_img, show = 0, titles = ['original','undistorted & warped & edge enhanced & cut'])
+    ax1.plot(x, y,'r', alpha=0.5, linewidth=1)
+    ax2.plot(x2, y2,'r', alpha=0.5, linewidth=2)
+    plt.savefig('./output_images/2_img_straight3.png')
+
     plt.show()
 
 
 # ## 3. Getting Binary
 
-# In[9]:
+# In[ ]:
 
 
 def colormask_treshold(img, lower, upper):
@@ -406,7 +423,7 @@ def get_binary_img(img, plot_masks = 0, single_img = 1, line_color = 0):
         line_color = 0
     else:
         img = norm_0_255(img)
-        # mean_img = np.mean(img)
+#         mean_img = np.mean(img)
         #####
         hls_img = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
         hls0_max = np.amax(hls_img[:,:,0])
@@ -684,7 +701,7 @@ def get_binary_img(img, plot_masks = 0, single_img = 1, line_color = 0):
             plt.axis('off')
             plt.savefig('./output_images/3_bin_hsv_mask.png')
 
-            plt.figure(figsize=(13,5))
+            plt.figure(figsize=(13,2))
             plt.subplots_adjust(top=1.0,bottom=0.0,left=0.0,right=1.0,hspace=0.1,wspace=0.05)
             plt.subplot(1,3,1)
             plt.imshow(red_img, cmap='inferno')
@@ -702,7 +719,7 @@ def get_binary_img(img, plot_masks = 0, single_img = 1, line_color = 0):
             plt.axis('off')
             plt.savefig('./output_images/3_bin_red_and_adap_mask.png')
 
-            plt.figure(figsize=(13,5))
+            plt.figure(figsize=(13,2))
             plt.subplots_adjust(top=1.0,bottom=0.0,left=0.0,right=1.0,hspace=0.1,wspace=0.05)
 
             plt.subplot(1,3,1)
@@ -732,7 +749,7 @@ def get_binary_img(img, plot_masks = 0, single_img = 1, line_color = 0):
 
 # ### 3.1 Demo
 
-# In[10]:
+# In[ ]:
 
 
 
@@ -745,7 +762,7 @@ if plot_demos <=3:
         print(' \n ----NEW IMAGE----')
         img = mpimg.imread(img_name)
 
-        warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst,cut_flag= 1)
+        warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst)
 
         if i == 0:
             binary_img = get_binary_img(warped_img, plot_masks = 1)
@@ -768,7 +785,7 @@ if plot_demos <=3:
 
 # ## 4. Getting Lane Lines: Polyfit using sliding window
 
-# In[11]:
+# In[ ]:
 
 
 def polyfit_sliding_win(img):
@@ -867,7 +884,7 @@ def polyfit_sliding_win(img):
 
 # ### 4.1 Demo
 
-# In[12]:
+# In[ ]:
 
 
 if plot_demos <= 4:
@@ -911,7 +928,7 @@ if plot_demos <= 4:
 
 # ## 5. Getting Lane Lines: Polyfit using previous fit search window
 
-# In[13]:
+# In[ ]:
 
 
 def polyfit_search_win(img, poly_para, poly_data, debug_plot = 0, plot_win_masks = 0, line_colors = [0,0], return_line_colors = 0):
@@ -1043,7 +1060,9 @@ def polyfit_search_win(img, poly_para, poly_data, debug_plot = 0, plot_win_masks
 
            plt.subplots_adjust(top=0.98,bottom=0.0,left=0.0,right=1.0,hspace=0.1,wspace=0.05)
            plt.savefig('./gif_images/process_{}.png'.format(window))
-           plt.show()
+
+           if debug_plot==2:
+               plt.show()
 
            plot_img[win_y_low:win_y_high, win_xleft_low:win_xleft_high] = plot_win_left
            plot_img[win_y_low:win_y_high, win_xright_low:win_xright_high] = plot_win_right
@@ -1138,7 +1157,7 @@ def polyfit_search_win(img, poly_para, poly_data, debug_plot = 0, plot_win_masks
 
 # ### 5.1 Demo
 
-# In[14]:
+# In[ ]:
 
 
 # Initialization
@@ -1150,7 +1169,7 @@ if plot_demos <= 5:
     # Make a list of test images
     images = glob.glob('./video_images/*.jpg')
     images = sort_nicely(images)
-    for i,img_name in enumerate(images[1369:1375]):
+    for i,img_name in enumerate(images[400:404]):
 
         img = mpimg.imread(img_name)
 
@@ -1166,7 +1185,7 @@ if plot_demos <= 5:
             old_right_fitx = poly_data[1]
             old_ploty = poly_data[2]
 
-            poly_img, poly_para, poly_data = polyfit_search_win(warped_img, poly_para, poly_data, debug_plot = 0, plot_win_masks = 0)
+            poly_img, poly_para, poly_data = polyfit_search_win(warped_img, poly_para, poly_data, debug_plot = 1, plot_win_masks = 0)
 
         poly_img = norm_0_255(poly_img)
         poly_img = weighted_img(poly_img, 1, warped_img,0.3)
@@ -1176,16 +1195,20 @@ if plot_demos <= 5:
 
         _, ax1, ax2 = plot_two_images(poly_img, img, show = 0)
 
-        if i > 0:
+
+        if i == 0:
+            plt.savefig('./output_images/5_poly_search0.png')
+        else:
             ax1.plot(old_left_fitx, old_ploty, color='deeppink')
             ax1.plot(old_right_fitx, old_ploty, color='deeppink')
-        plt.savefig('./output_images/5_poly_search.png')
+            plt.savefig('./output_images/5_poly_search.png')
+
         plt.show()
 
 
 # ### 5.2 Visualization of used method
 
-# In[15]:
+# In[ ]:
 
 
 from IPython.display import Image
@@ -1195,7 +1218,7 @@ display(Image(url='./output_images/process_gif.gif'))
 
 # ## 6. Get meter per pixel
 
-# In[16]:
+# In[ ]:
 
 
 # Define conversions in x and y from pixels space to meters
@@ -1234,7 +1257,7 @@ def get_m_per_pix(img,dashed, lane_width_m = 3.7, dashed_line_length = 3.048, pl
 
         plt.text(x_base+30,y_top_dashed_line+50, '{}m'.format(dashed_line_length), color='r')
         plt.plot([x_base,x_base], [y_top_dashed_line,y_bottom_dashed_line], color='r')
-        plt.savefig('./output_images/6_xm_ym_perpixel.png')
+        plt.savefig('./output_images/6_xm_ym_perpixel{}m.png'.format(y_pixs))
         plt.show()
 
     return xm_per_pix, ym_per_pix, histogram
@@ -1242,7 +1265,7 @@ def get_m_per_pix(img,dashed, lane_width_m = 3.7, dashed_line_length = 3.048, pl
 
 # ### 6.1 Demo
 
-# In[17]:
+# In[ ]:
 
 
 # Demo
@@ -1252,11 +1275,11 @@ else:
     plot_it = 0
 
 img = mpimg.imread('./test_images/straight_lines1.jpg')
-warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst,cut_flag = 1)
+warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst)
 xm_per_pix, ym_per_pix, histogram = get_m_per_pix(warped_img, dashed ='right',plot_it = plot_it)
 
 img = mpimg.imread('./test_images/straight_lines2.jpg')
-warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst,cut_flag = 1)
+warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst)
 xm_per_pix2, ym_per_pix2, histogram = get_m_per_pix(warped_img, dashed ='left', plot_it = plot_it)
 
 xm_per_pix = (xm_per_pix + xm_per_pix2) /2
@@ -1270,7 +1293,7 @@ print("averaged meter per pixel in x direction : ", xm_per_pix)
 
 # ## 7. Measure Curvature and draw on real image
 
-# In[18]:
+# In[ ]:
 
 
 def get_curvature(poly_data, ym_per_pix, xm_per_pix):
@@ -1291,7 +1314,7 @@ def get_curvature(poly_data, ym_per_pix, xm_per_pix):
     return left_curverad, right_curverad
 
 
-# In[19]:
+# In[ ]:
 
 
 def get_middle_offset(xsize, ysize, poly_data, xm_per_pix):
@@ -1308,7 +1331,7 @@ def get_middle_offset(xsize, ysize, poly_data, xm_per_pix):
     return offset, xl, xr
 
 
-# In[20]:
+# In[ ]:
 
 
 def draw_on_real_img(orig_img, poly_data, Minv):
@@ -1345,7 +1368,7 @@ def draw_on_real_img(orig_img, poly_data, Minv):
     return result
 
 
-# In[21]:
+# In[ ]:
 
 
 def draw_data(original_img, curv_rad, center_dist,poly_para, line_colors=[0,0]):
@@ -1405,7 +1428,7 @@ def draw_data(original_img, curv_rad, center_dist,poly_para, line_colors=[0,0]):
 
 # ### 7.1 Demo
 
-# In[22]:
+# In[ ]:
 
 
 #Demo
@@ -1416,7 +1439,7 @@ if plot_demos <= 7:
     for i,img_name in enumerate(images):
 
         img = mpimg.imread(img_name)
-        warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst,cut_flag = 1)
+        warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst)
         binary_img = get_binary_img(warped_img)
 
         poly_img, histogram, poly_para, poly_data = polyfit_sliding_win(binary_img)
@@ -1436,7 +1459,7 @@ if plot_demos <= 7:
 
 # ## 8. Complete Pipeline
 
-# In[23]:
+# In[ ]:
 
 
 def pipeline(img, safe_imgs = 0, debug_result = 1, bypass = 0, plot_it_directly=0):
@@ -1448,7 +1471,7 @@ def pipeline(img, safe_imgs = 0, debug_result = 1, bypass = 0, plot_it_directly=
     result = img.copy()
 
     if not bypass:
-        warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst,cut_flag = 1)
+        warped_img, M , M_inv = preprocess_img(img, mtx=mtx, dist=dist, src=src, dst=dst)
 
        # print(poly_para)
 
@@ -1496,7 +1519,7 @@ def pipeline(img, safe_imgs = 0, debug_result = 1, bypass = 0, plot_it_directly=
 
 # ### 8.1 Demo
 
-# In[24]:
+# In[ ]:
 
 
 # Demo
@@ -1535,13 +1558,14 @@ if plot_demos <= 8:
         plt.figure(figsize=(13,5))
         plt.imshow(result)
         plt.axis('off')
+        plt.subplots_adjust(top=0.98,bottom=0.0,left=0.0,right=1.0,hspace=0.1,wspace=0.05)
         plt.savefig('./output_images/complete_pipeline.png')
         plt.show()
 
 
 # ## 9. Video
 
-# In[25]:
+# In[ ]:
 
 
 # Import everything needed to edit/save/watch video clips
@@ -1566,11 +1590,10 @@ def process_frame(frame):
                      debug_result = 0,
                      bypass = 0,
                      plot_it_directly=0)
-
     return frame
 
 
-# In[26]:
+# In[ ]:
 
 
 # Initialization
@@ -1581,6 +1604,7 @@ video1_output = 'project_video_output.mp4'
 video1_input = VideoFileClip('project_video.mp4')#.subclip(22,26)
 processed_video = video1_input.fl_image(process_frame)
 get_ipython().run_line_magic('time', 'processed_video.write_videofile(video1_output, audio=False)')
+del video1_input
 
 # Initialization
 poly_arr = np.array([])
@@ -1590,9 +1614,10 @@ video1_output = 'project_video_output_debug.mp4'
 video1_input = VideoFileClip('project_video.mp4')#.subclip(22,26)
 processed_video = video1_input.fl_image(process_frame_debug)
 get_ipython().run_line_magic('time', 'processed_video.write_videofile(video1_output, audio=False)')
+del video1_input
 
 
-# In[27]:
+# In[ ]:
 
 
 # Initialization
@@ -1601,8 +1626,10 @@ reset_poly = 1
 
 video1_output = 'challenge_video_output.mp4'
 video1_input = VideoFileClip('challenge_video.mp4')#.subclip(22,26)
+
 processed_video = video1_input.fl_image(process_frame)
 get_ipython().run_line_magic('time', 'processed_video.write_videofile(video1_output, audio=False)')
+del video1_input
 
 # Initialization
 poly_arr = np.array([])
@@ -1612,3 +1639,4 @@ video1_output = 'challenge_video_output_debug.mp4'
 video1_input = VideoFileClip('challenge_video.mp4')#.subclip(22,26)
 processed_video = video1_input.fl_image(process_frame_debug)
 get_ipython().run_line_magic('time', 'processed_video.write_videofile(video1_output, audio=False)')
+del video1_input
