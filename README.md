@@ -129,7 +129,9 @@ So in the end 5 different masks (HLS mask, HSV mask, LAB mask, red mask and adap
 ### 4. **Getting Lane Lines: Polyfit using sliding window**
 
 First a histogram along all the columns in the lower half of the image is taken. With this histogram I am adding up the pixel values along each column in the image. In my thresholded binary image, pixels are either 0 or 1, so the two most prominent peaks in this histogram will be good indicators of the x-position of the base of the lane lines. I use that as a starting point for where to search for the lines. From that point, I use a sliding window, placed around the line centers, to find and follow the "hot" pixels up to the top of the frame. These pixels are then used to polyfit a second order polynomial to the following formula:
+
 ![formula0]
+
 We're fitting for f(y), rather than f(x), because the lane lines in the warped image are near vertical and may have the same x value for more than one y value.
 
 The following parameters were chosen:
@@ -195,26 +197,23 @@ That gives us:
 ### 7. **Measure Curvature and draw on real image**
 
 The radius of curvature (awesome tutorial here) at any point x of the function x=f(y) is given as follows:
+
+
 ![formula1]
 
-<!-- $$
-R_{curve} = \frac{[1+(\frac{dx}{dy})^2] ^ {\frac{3}2}} {|\frac{d^2x} {dy^2}|}
-$$ -->
 In the case of the second order polynomial above, the first and second derivatives are:
+
+
 ![formula2]
-<!-- $$
-\frac{dx}{dy} = 2Ay + B
-$$ -->
+
+
 ![formula3]
-<!-- $$
-\frac{d^2x}{dy^2} = 2A
-$$ -->
+
 
 So, our equation for radius of curvature becomes:
+
+
 ![formula4]
-<!-- $$
-R_{curve} = \frac{[1+(2Ay + B)^2] ^ {\frac{3}2}} {|2A|}
-$$ -->
 
 
 The y values of your image increase from top to bottom, so if, for example, you wanted to measure the radius of curvature closest to your vehicle, you could evaluate the formula above at the y value corresponding to the bottom of your image, or in Python, at ``yvalue = image.shape[0].``
@@ -236,7 +235,7 @@ right_curverad = ((1 + (2*right_fit_corrected[0]*y_eval*ym_per_pix + right_fit_c
 ![img14]
 
 ### 8. **Complete Pipeline**
-A complete image processing pipeline was established to find the lane lines in images successfully and can process videos frame by frame. The video output ``project_video_output`` and ``challenge_video_output`` can be found in this directory.
+A complete image processing pipeline was established to find the lane lines in images successfully and can process videos frame by frame. The video output ``project_video_output.mp4`` and ``challenge_video_output.mp4`` can be found in this directory.
 
 **Example of pipelined frame with debugging views:**
 
