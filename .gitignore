@@ -22,4 +22,5 @@ project_video_output_debug
 
 *.cmd
 
+*.ini
 img_*.jpg
