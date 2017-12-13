@@ -125,7 +125,7 @@ So in the end 5 different masks (HLS mask, HSV mask, LAB mask, red mask and adap
 
 First a histogram along all the columns in the lower half of the image is taken. With this histogram I am adding up the pixel values along each column in the image. In my thresholded binary image, pixels are either 0 or 1, so the two most prominent peaks in this histogram will be good indicators of the x-position of the base of the lane lines. I use that as a starting point for where to search for the lines. From that point, I use a sliding window, placed around the line centers, to find and follow the "hot" pixels up to the top of the frame. These pixels are then used to polyfit a second order polynomial to the following formula:
 
-$$ x = f(y)=Ay^2+By+C $$
+\\[ x = f(y) =Ay^2+By+C ]\\
 We're fitting for f(y), rather than f(x), because the lane lines in the warped image are near vertical and may have the same x value for more than one y value.
 
 The following parameters were chosen:
