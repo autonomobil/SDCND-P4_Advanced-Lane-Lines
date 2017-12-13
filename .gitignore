@@ -1,12 +1,25 @@
 calibration_wide
+
 video_images
+
 imgs
+
 gif_images
+
 *.db
+
 .ipynb_checkpoints
+
 Rubbish
+
 project_video
+
 challenge_video
+
 challenge_video_output_debug
+
 project_video_output_debug
+
 start P4.cmd
+
+img_*.jpg
